@@ -1,0 +1,319 @@
+function Node(data,left=null,right=null){
+    return {
+        data,
+        left,
+        right
+    }
+}
+
+function Tree(array){
+    return {
+        array:array,
+        buildTree:function(){
+            // remove duplicate 
+            let newArray = [...new Set(this.array)]
+            // sort by number 
+            newArray.sort(function(a,b){return(a-b)})
+            if (newArray.length==0){
+                return;
+            }
+            else if (newArray.length==1){
+                return Node(newArray.at(0))
+            }
+            else {
+            // assign left root right 
+            
+            let index = Math.floor(newArray.length/2)
+            
+            let left = Tree(newArray.slice(0,index)).buildTree()
+            let right = Tree(newArray.slice(index+1)).buildTree()
+            let root =Node(newArray.at(index),left,right)
+            return root
+        }
+        },
+        insert:function(value){
+            const root= this.buildTree()
+            let current = Object.assign({},root);
+            while (current){
+            if (current.data<value){
+                if (!current.right){
+                    current.right= Node(value)
+                    return root
+                }
+                //go right
+                current = current.right
+            }
+            else if (current.data>value){
+                if (!current.left){
+                    current.left = Node(value);
+                    return root
+                }
+                // go left
+                current= current.left
+            }
+            else{
+                // do nothing if the value is already in the tree
+                return root;
+            }
+        }
+        },
+
+        find: function(value) {
+            let current = this.buildTree();
+            while (true){
+                if (current.data<value){
+                    if (!current.right){
+                        return null;
+                    }
+                    // go right
+                    current = current.right 
+                }
+                else if (current.data>value){
+                    if (!current.left){
+                        return null;
+                    }
+                    // go left 
+                    current = current.left 
+                }
+                else {
+                    // found
+                    return current
+                }
+            }
+
+        },
+        delete: function(value){
+            const root= this.buildTree();
+            let current = Object.assign({},root);
+            let path = [current];
+            let direction = []
+            while (true){
+                if (current.data<value){
+                    if (!current.right){
+                        return null;
+                    }
+                    // go right
+                    path.push(current)
+                    direction.push('right')
+                    current = current.right 
+                }
+                else if (current.data>value){
+                    if (!current.left){
+                        return null;
+                    }
+                    // go left 
+                    path.push(current)
+                    direction.push('left')
+                    current = current.left 
+
+                }
+                else {
+                    // found the node with the value 
+                    const last = path.at(-1)
+                    const d = direction.at(-1)
+                    // if node is a leave 
+                    if (!current.left & !current.right){
+                        last[d] = null;
+                        return root;
+                    }
+                    // if node have one child 
+                    else if (!(current.left) | !(current.right)){
+                        if (current.left){
+                            last[d] = current.left
+                            return root
+                        }
+                        else if (current.right){
+                            last[d] = current.right
+                            return root
+                        }
+                    }
+                    // node has two children
+                    else {
+                        let replace=current.right;
+                        // find node with least higher value
+                        const leftNode = current.left 
+                        const rightNode = current.right;
+                        current = current.right;
+                        let pathReplace = [current]
+                        while (current.left){
+                           replace = current.left 
+                           current = current.left
+                           pathReplace.push(current)
+                        }
+                        // if replace has no child 
+                        if (!current.left & !current.right){
+                        last[d] = replace;
+                        replace.left = leftNode
+                        return root
+                        }
+                        // if replace has child
+                        // doesn't exist
+                        else {
+                            last[d] = replace;
+                            replace.left = leftNode
+                            replace.right = rightNode;
+                        }
+                    }
+
+                    
+                }
+            }
+
+        },
+        levelOrder: function(call=null){
+            const root= this.buildTree();
+            let que = [root]
+            let result = [root.data]
+
+            while (que.length>0){
+            const first= que.shift()
+            if (first.left){
+                result.push(first.left.data)
+                que.push(first.left)
+            }
+            if (first.right){
+                result.push(first.right.data)
+                que.push(first.right)
+            }
+            }
+            if (call){
+                let ls = []
+                for (i of result){
+                    ls.push(call(i))
+                }
+                return ls
+            }
+            return result
+            
+        }, 
+        // root left right 
+        preorder :function(root,call=null){
+            if (call){
+                const ls = this.preorder(root);
+                let result = []
+                for (i of ls){
+                    result.push(call(i))
+                }
+                return result
+            }
+            else {
+            if (!root) return [];
+            else {
+                return [root.data,...this.preorder(root.left),...this.preorder(root.right)]
+            }
+        }
+
+    },
+    // left root right 
+    inorder :function(root,call=null){
+        if (call){
+            const ls = this.inorder(root);
+            let result = []
+            for (i of ls){
+                result.push(call(i))
+            }
+            return result
+        }
+        else {
+        if (!root) return [];
+        else {
+            return [...this.inorder(root.left),root.data,...this.inorder(root.right)]
+        }
+    }
+
+},
+   // left right root 
+   postorder :function(root,call=null){
+    if (call){
+        const ls = this.postorder(root);
+        let result = []
+        for (i of ls){
+            result.push(call(i))
+        }
+        return result
+    }
+    else {
+    if (!root) return [];
+    else {
+        return [...this.postorder(root.left),...this.postorder(root.right),root.data]
+    }
+}
+
+},
+}
+}
+
+
+
+const prettyPrint = (node, prefix = '', isLeft = true) => {
+    if (node.right !== null) {
+      prettyPrint(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
+    }
+    console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
+    if (node.left !== null) {
+      prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
+    }
+  }
+
+// test 
+let a = [20,30,40,32,34,36,38,50,70,60,65,80,75,81,85,21]
+
+tree = Tree(a)
+
+
+// insert test 
+// prettyPrint(tree.insert(41))
+
+
+// find test 
+//console.log(tree.find(30))
+
+
+// delete test 
+
+//leave 
+//prettyPrint(tree.delete(70))
+
+// node with one child 
+//prettyPrint(tree.delete(85))
+
+
+// node with two children 
+
+// replacement has no child 
+//prettyPrint(tree.buildTree())
+//prettyPrint(tree.delete(65))
+
+// replacement has one child 
+//  this doesn't exist
+//prettyPrint(tree.buildTree())
+
+
+// level order test 
+
+//prettyPrint(tree.buildTree())
+//console.log(tree.levelOrder())
+
+function isEven(x){
+    return x%2==0
+}
+
+//console.log(tree.levelOrder(isEven))
+
+
+// test preorder 
+
+//prettyPrint(tree.buildTree())
+//console.log(tree.preorder(tree.buildTree()))
+//console.log(tree.preorder(tree.buildTree(),isEven))
+
+// test inorder 
+
+//prettyPrint(tree.buildTree())
+//console.log(tree.inorder(tree.buildTree()))
+//console.log(tree.inorder(tree.buildTree(),isEven))
+
+prettyPrint(tree.buildTree())
+console.log(tree.postorder(tree.buildTree()))
+console.log(tree.postorder(tree.buildTree(),isEven))
+
