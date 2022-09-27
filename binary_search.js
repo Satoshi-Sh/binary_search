@@ -313,7 +313,7 @@ function isEven(x){
 //console.log(tree.inorder(tree.buildTree()))
 //console.log(tree.inorder(tree.buildTree(),isEven))
 
-prettyPrint(tree.buildTree())
-console.log(tree.postorder(tree.buildTree()))
-console.log(tree.postorder(tree.buildTree(),isEven))
+//prettyPrint(tree.buildTree())
+//console.log(tree.postorder(tree.buildTree()))
+//console.log(tree.postorder(tree.buildTree(),isEven))
 
