@@ -31,8 +31,8 @@ function Tree(array){
             return root
         }
         },
-        insert:function(value){
-            const root= this.buildTree()
+        insert:function(value,root){
+            //const root= this.buildTree()
             let current = Object.assign({},root);
             while (current){
             if (current.data<value){
@@ -53,7 +53,7 @@ function Tree(array){
             }
             else{
                 // do nothing if the value is already in the tree
-                return;
+                return root;
             }
         }
         },
@@ -160,8 +160,7 @@ function Tree(array){
             }
 
         },
-        levelOrder: function(call=null){
-            const root= this.buildTree();
+        levelOrder: function(root=this.buildTree(),call=null){
             let que = [root]
             let result = [root.data]
 
@@ -187,7 +186,7 @@ function Tree(array){
             
         }, 
         // root left right 
-        preorder :function(root,call=null){
+        preorder :function(root, call=null){
             if (call){
                 const ls = this.preorder(root);
                 let result = []
@@ -242,6 +241,9 @@ function Tree(array){
 },
 // return to the step number from the node to the bottom leave(longest)
 height: function(node){
+    if (!node){
+        return 0
+    }
     let que = [node];
     let count = -1;
     while (que.length>0){
@@ -255,7 +257,7 @@ height: function(node){
             temp.push(i.right)
           }
           que = [...temp]
-        }
+    }
     }
     return count
 
@@ -291,6 +293,29 @@ depth: function(node){
     }
 
 },
+isBalanced2: function(root){
+    if(Math.min(...this.isBalanced(root))==1){
+        return true;
+    }
+    else {
+        return false;
+    }
+},
+isBalanced: function(root){
+  if (!root){
+    return []
+  }
+  let left =root.left;
+  let right = root.right;
+  const result = Math.abs(this.height(left) - this.height(right))<=1;
+
+  return [result, ...this.isBalanced(left),...this.isBalanced(right)]
+},
+rebalance:function(root){
+    // update array
+    this.array = this.preorder(root)
+    return this.buildTree()
+}
 }
 }
 
@@ -307,9 +332,9 @@ const prettyPrint = (node, prefix = '', isLeft = true) => {
   }
 
 // test 
-let a = [20,30,40,32,34,36,38,50,70,60,65,80,75,81,85,21]
+//let a = [20,30,40,32,34,36,38,50,70,60,65,80,75,81,85,21]
 
-tree = Tree(a)
+//tree = Tree(a)
 
 
 // insert test 
@@ -380,4 +405,61 @@ function isEven(x){
 
 
 // isBalanced test 
-prettyPrint(tree.insert(19))
+//console.log(tree.isBalanced2(tree.buildTree()))
+// add random numbers
+ //let newRoot = tree.buildTree()
+ //for (let i=0;i<100;i++){
+ //    newRoot = tree.insert(Math.floor(Math.random() * 100),newRoot) 
+ //}
+ //console.log(tree.isBalanced2(newRoot))
+
+ //prettyPrint(tree.rebalance(newRoot))
+
+
+
+ // tie it all together 
+
+
+function tieTogether(){
+   let randoms =[]
+   for (let i=0;i<50;i++){
+    randoms.push(Math.floor(Math.random() *100))
+    }
+    tree = Tree(randoms)
+    const root = tree.buildTree()
+    prettyPrint(root)
+    //is balanced
+    console.log(`isBalanced: ${tree.isBalanced2(root)}`)
+    // print all 
+    console.log(tree.levelOrder())
+    console.log(tree.preorder(root))
+    console.log(tree.postorder(root))
+    console.log(tree.inorder(root))
+
+    // add 100 random numbers to make it unbalance
+    let newRoot = root
+    for (let i=0;i<50;i++){
+            newRoot = tree.insert(Math.floor(Math.random() * 200),newRoot) 
+        }
+    prettyPrint(newRoot);
+    // print all
+    console.log(`isBalanced: ${tree.isBalanced2(newRoot)}`)
+    console.log(tree.levelOrder(newRoot))
+    console.log(tree.preorder(newRoot))
+    console.log(tree.postorder(newRoot))
+    console.log(tree.inorder(newRoot))
+
+    // rebalance
+    let lastRoot = tree.rebalance(newRoot)
+
+    prettyPrint(lastRoot);
+    console.log(`isBlanced ${tree.isBalanced2(lastRoot)}`);
+    // print all
+    console.log(tree.levelOrder(lastRoot))
+    console.log(tree.preorder(lastRoot))
+    console.log(tree.postorder(lastRoot))
+    console.log(tree.inorder(lastRoot))
+    
+}
+
+tieTogether()
