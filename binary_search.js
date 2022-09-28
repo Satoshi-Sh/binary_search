@@ -53,7 +53,7 @@ function Tree(array){
             }
             else{
                 // do nothing if the value is already in the tree
-                return root;
+                return;
             }
         }
         },
@@ -240,6 +240,57 @@ function Tree(array){
 }
 
 },
+// return to the step number from the node to the bottom leave(longest)
+height: function(node){
+    let que = [node];
+    let count = -1;
+    while (que.length>0){
+        count ++;
+        let temp = []
+        for(let i of que){
+          if (i.left){
+            temp.push(i.left)
+          }
+          else if (i.right){
+            temp.push(i.right)
+          }
+          que = [...temp]
+        }
+    }
+    return count
+
+    
+},
+// return to the step  the root  to the node
+depth: function(node){
+    let step =0;
+    let current = this.buildTree(); 
+    while (true){
+        if (node.data>current.data){
+            if (!current.right){
+                // the node doesn't exist
+                return;
+            }
+            // go right
+            current = current.right
+            step++
+        }
+        else if (node.data<current.data){
+            if (!current.left){
+                //the node doesn't exist
+                return;
+            }
+            // go left
+            current = current.left;
+            step++
+        }
+        else {
+            //found the node 
+            return step;
+        }
+    }
+
+},
 }
 }
 
@@ -317,3 +368,16 @@ function isEven(x){
 //console.log(tree.postorder(tree.buildTree()))
 //console.log(tree.postorder(tree.buildTree(),isEven))
 
+
+// height test
+// prettyPrint(tree.buildTree())
+// console.log(tree.height(tree.find(81)));
+
+
+// depth test
+//prettyPrint(tree.buildTree())
+//console.log(tree.depth(tree.find(20)));
+
+
+// isBalanced test 
+prettyPrint(tree.insert(19))
